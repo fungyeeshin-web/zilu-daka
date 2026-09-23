@@ -1,0 +1,11 @@
+{
+  "name": "自律打卡",
+  "short_name": "自律打卡",
+  "description": "每天坚持，成为更好的自己",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#080a14",
+  "theme_color": "#090b16",
+  "orientation": "portrait",
+  "lang": "zh-CN"
+}
