@@ -1,0 +1,1370 @@
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090b16">
+<link rel="manifest" href="manifest.json">
+<title>自律打卡</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+:root{
+    --bg:#080a14;
+    --card:rgba(255,255,255,.07);
+    --border:rgba(255,255,255,.12);
+    --text:#f5f7ff;
+    --muted:#9299ad;
+    --blue:#60a5fa;
+    --purple:#a78bfa;
+    --green:#4ade80;
+    --yellow:#facc15;
+}
+
+body{
+    font-family:Arial,"Microsoft YaHei",sans-serif;
+    background:
+        radial-gradient(circle at 20% 10%,rgba(96,165,250,.18),transparent 30%),
+        radial-gradient(circle at 90% 20%,rgba(167,139,250,.18),transparent 30%),
+        linear-gradient(135deg,#080a14,#111827 60%,#080a14);
+    color:var(--text);
+    min-height:100vh;
+    padding:25px 15px 50px;
+}
+
+.container{
+    width:100%;
+    max-width:520px;
+    margin:auto;
+}
+
+/* ================= 标题 ================= */
+
+.header{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.title{
+    font-size:42px;
+    font-weight:900;
+    letter-spacing:4px;
+    margin-bottom:8px;
+
+    color:#fff;
+
+    text-shadow:
+        0 0 5px #fff,
+        0 0 15px #60a5fa,
+        0 0 30px #60a5fa,
+        0 0 55px #a78bfa;
+
+    animation:glow 2.5s infinite alternate;
+}
+
+@keyframes glow{
+    from{
+        text-shadow:
+        0 0 5px #fff,
+        0 0 15px #60a5fa,
+        0 0 30px #60a5fa;
+    }
+
+    to{
+        text-shadow:
+        0 0 8px #fff,
+        0 0 20px #60a5fa,
+        0 0 40px #a78bfa,
+        0 0 70px #a78bfa;
+    }
+}
+
+.subtitle{
+    color:#aeb6c9;
+    font-size:14px;
+    letter-spacing:2px;
+}
+
+/* ================= 卡片 ================= */
+
+.card{
+    background:rgba(255,255,255,.055);
+    border:1px solid var(--border);
+    border-radius:25px;
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.35),
+        inset 0 1px rgba(255,255,255,.06);
+
+    margin-bottom:18px;
+}
+
+/* ================= 日历 ================= */
+
+.calendar{
+    padding:18px;
+}
+
+.calendar-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:18px;
+}
+
+.month-title{
+    font-size:18px;
+    font-weight:bold;
+}
+
+.month-btn{
+    width:38px;
+    height:38px;
+    border-radius:12px;
+    border:1px solid var(--border);
+    background:rgba(255,255,255,.06);
+    color:white;
+    font-size:20px;
+    cursor:pointer;
+}
+
+.month-btn:active{
+    transform:scale(.92);
+}
+
+.weekdays,
+.calendar-days{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:5px;
+}
+
+.weekdays div{
+    color:#70788d;
+    font-size:12px;
+    padding:5px 0;
+}
+
+.calendar-day{
+    position:relative;
+    height:43px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:12px;
+    cursor:pointer;
+    color:#dce1ed;
+    font-size:14px;
+}
+
+.calendar-day:hover{
+    background:rgba(255,255,255,.08);
+}
+
+.calendar-day.today{
+    border:1px solid rgba(250,204,21,.6);
+    color:#facc15;
+}
+
+.calendar-day.selected{
+    background:linear-gradient(
+        135deg,
+        rgba(96,165,250,.35),
+        rgba(167,139,250,.35)
+    );
+    border:1px solid rgba(96,165,250,.7);
+    color:white;
+    font-weight:bold;
+}
+
+.calendar-day .dot{
+    position:absolute;
+    bottom:4px;
+    width:5px;
+    height:5px;
+    background:#4ade80;
+    border-radius:50%;
+    box-shadow:0 0 8px #4ade80;
+}
+
+/* ================= 连击 ================= */
+
+.streak-card{
+    text-align:center;
+    padding:30px 20px;
+}
+
+.fire{
+    font-size:48px;
+    filter:drop-shadow(0 0 12px rgba(255,120,30,.5));
+}
+
+.streak-number{
+    font-size:82px;
+    line-height:1;
+    font-weight:900;
+    margin:8px 0;
+
+    background:linear-gradient(
+        180deg,
+        #fff,
+        #facc15
+    );
+
+    -webkit-background-clip: text;
+    color:transparent;
+
+    filter:drop-shadow(0 0 15px rgba(250,204,21,.25));
+}
+
+.days-text{
+    color:#cbd1df;
+    font-size:18px;
+    margin-bottom:22px;
+}
+
+.main-check{
+    width:100%;
+    padding:18px;
+    border:none;
+    border-radius:16px;
+
+    background:linear-gradient(
+        135deg,
+        #4ade80,
+        #22c55e
+    );
+
+    color:#06250f;
+    font-size:18px;
+    font-weight:bold;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 8px 25px rgba(74,222,128,.2);
+
+    transition:.2s;
+}
+
+.main-check:hover{
+    transform:translateY(-2px);
+}
+
+.main-check.checked{
+    background:linear-gradient(
+        135deg,
+        #475569,
+        #334155
+    );
+
+    color:white;
+    box-shadow:none;
+}
+
+/* ================= 进度 ================= */
+
+.progress-card{
+    padding:20px;
+}
+
+.progress-top{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:12px;
+    font-size:14px;
+}
+
+.progress-percent{
+    color:#60a5fa;
+    font-weight:bold;
+}
+
+.progress-bar{
+    height:9px;
+    border-radius:20px;
+    background:rgba(255,255,255,.08);
+    overflow:hidden;
+}
+
+.progress-fill{
+    height:100%;
+    width:0%;
+    border-radius:20px;
+
+    background:linear-gradient(
+        90deg,
+        #60a5fa,
+        #a78bfa
+    );
+
+    box-shadow:0 0 15px rgba(96,165,250,.5);
+
+    transition:.4s;
+}
+
+/* ================= 习惯 ================= */
+
+.habits{
+    padding:8px 15px;
+}
+
+.habit{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:17px 5px;
+    border-bottom:1px solid rgba(255,255,255,.07);
+}
+
+.habit:last-child{
+    border-bottom:none;
+}
+
+.habit-icon{
+    width:45px;
+    height:45px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:14px;
+
+    background:rgba(255,255,255,.07);
+
+    font-size:22px;
+}
+
+.habit-info{
+    flex:1;
+    text-align:left;
+}
+
+.habit-name{
+    font-size:16px;
+    font-weight:bold;
+    margin-bottom:4px;
+}
+
+.habit-desc{
+    color:#858da0;
+    font-size:12px;
+}
+
+.habit-btn{
+    border:none;
+    padding:9px 14px;
+    border-radius:11px;
+
+    background:rgba(255,255,255,.08);
+    color:#d8deeb;
+
+    cursor:pointer;
+}
+
+.habit-btn.checked{
+    background:#4ade80;
+    color:#06250f;
+    font-weight:bold;
+}
+
+/* ================= 数据 ================= */
+
+.stats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.stat{
+    padding:18px;
+    text-align:center;
+}
+
+.stat-number{
+    font-size:28px;
+    font-weight:bold;
+    color:#60a5fa;
+    margin-bottom:5px;
+}
+
+.stat-label{
+    font-size:12px;
+    color:#8f97aa;
+}
+
+/* ================= 状态 ================= */
+
+.status{
+    margin-top:15px;
+    color:#aeb6c9;
+    font-size:14px;
+}
+
+/* ================= 底部 ================= */
+
+.quote{
+    text-align:center;
+    color:#737b8f;
+    font-size:13px;
+    margin:25px 0;
+    line-height:1.7;
+}
+
+.reset-button{
+    display:block;
+    margin:0 auto;
+
+    padding:10px 18px;
+
+    border:1px solid rgba(255,255,255,.12);
+    background:transparent;
+
+    color:#737b8f;
+
+    border-radius:10px;
+
+    cursor:pointer;
+}
+
+.reset-button:hover{
+    background:rgba(255,255,255,.06);
+    color:white;
+}
+
+/* ================= 手机 ================= */
+
+@media(max-width:500px){
+
+    body{
+        padding:18px 12px 40px;
+    }
+
+    .title{
+        font-size:34px;
+    }
+
+    .streak-number{
+        font-size:70px;
+    }
+
+    .calendar-day{
+        height:40px;
+    }
+
+    .habit{
+        padding:15px 3px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- 标题 -->
+
+    <div class="header">
+
+        <div class="title">
+            自律打卡
+        </div>
+
+        <div class="subtitle">
+            DAILY DISCIPLINE
+        </div>
+
+    </div>
+
+
+    <!-- ================= 日历 ================= -->
+
+    <div class="card calendar">
+
+        <div class="calendar-header">
+
+            <button class="month-btn" onclick="changeMonth(-1)">
+                ‹
+            </button>
+
+            <div class="month-title" id="monthTitle"></div>
+
+            <button class="month-btn" onclick="changeMonth(1)">
+                ›
+            </button>
+
+        </div>
+
+        <div class="weekdays">
+            <div>日</div>
+            <div>一</div>
+            <div>二</div>
+            <div>三</div>
+            <div>四</div>
+            <div>五</div>
+            <div>六</div>
+        </div>
+
+        <div class="calendar-days" id="calendarDays"></div>
+
+    </div>
+
+
+    <!-- ================= 连击 ================= -->
+
+    <div class="card streak-card">
+
+        <div class="fire">
+            🔥
+        </div>
+
+        <div class="streak-number" id="streak">
+            0
+        </div>
+
+        <div class="days-text">
+            天连续坚持
+        </div>
+
+        <button
+            class="main-check"
+            id="mainCheck"
+            onclick="toggleHabit('core')"
+        >
+            今日戒掉欲望
+        </button>
+
+        <div class="status" id="status">
+            今天还没有完成
+        </div>
+
+    </div>
+
+
+    <!-- ================= 进度 ================= -->
+
+    <div class="card progress-card">
+
+        <div class="progress-top">
+
+            <span>
+                今日完成度
+            </span>
+
+            <span
+                class="progress-percent"
+                id="progressText"
+            >
+                0%
+            </span>
+
+        </div>
+
+        <div class="progress-bar">
+
+            <div
+                class="progress-fill"
+                id="progressFill"
+            ></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= 习惯 ================= -->
+
+    <div class="card habits">
+
+        <!-- 运动 -->
+
+        <div class="habit">
+
+            <div class="habit-icon">
+                🏃
+            </div>
+
+            <div class="habit-info">
+
+                <div class="habit-name">
+                    运动
+                </div>
+
+                <div class="habit-desc">
+                    至少运动 20 分钟
+                </div>
+
+            </div>
+
+            <button
+                class="habit-btn"
+                id="exerciseBtn"
+                onclick="toggleHabit('exercise')"
+            >
+                打卡
+            </button>
+
+        </div>
+
+
+        <!-- 学习 -->
+
+        <div class="habit">
+
+            <div class="habit-icon">
+                📚
+            </div>
+
+            <div class="habit-info">
+
+                <div class="habit-name">
+                    学习
+                </div>
+
+                <div class="habit-desc">
+                    学习 / 阅读 30 分钟
+                </div>
+
+            </div>
+
+            <button
+                class="habit-btn"
+                id="studyBtn"
+                onclick="toggleHabit('study')"
+            >
+                打卡
+            </button>
+
+        </div>
+
+
+        <!-- 早睡 -->
+
+        <div class="habit">
+
+            <div class="habit-icon">
+                🌙
+            </div>
+
+            <div class="habit-info">
+
+                <div class="habit-name">
+                    早睡
+                </div>
+
+                <div class="habit-desc">
+                    按自己的目标时间睡觉
+                </div>
+
+            </div>
+
+            <button
+                class="habit-btn"
+                id="sleepBtn"
+                onclick="toggleHabit('sleep')"
+            >
+                打卡
+            </button>
+
+        </div>
+
+
+        <!-- 喝水 -->
+
+        <div class="habit">
+
+            <div class="habit-icon">
+                💧
+            </div>
+
+            <div class="habit-info">
+
+                <div class="habit-name">
+                    喝水
+                </div>
+
+                <div class="habit-desc">
+                    完成今日喝水目标
+                </div>
+
+            </div>
+
+            <button
+                class="habit-btn"
+                id="waterBtn"
+                onclick="toggleHabit('water')"
+            >
+                打卡
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= 数据 ================= -->
+
+    <div class="stats">
+
+        <div class="card stat">
+
+            <div
+                class="stat-number"
+                id="longest"
+            >
+                0
+            </div>
+
+            <div class="stat-label">
+                最长连续
+            </div>
+
+        </div>
+
+
+        <div class="card stat">
+
+            <div
+                class="stat-number"
+                id="total"
+            >
+                0
+            </div>
+
+            <div class="stat-label">
+                完成天数
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= 底部 ================= -->
+
+    <div class="quote">
+
+        每一次坚持，<br>
+        都是在成为更好的自己。
+
+    </div>
+
+    <button
+        class="reset-button"
+        onclick="resetData()"
+    >
+        清除全部记录
+    </button>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   数据
+===================================================== */
+
+let data =
+JSON.parse(
+    localStorage.getItem("disciplineData")
+) || {
+    days:{}
+};
+
+
+/* 当前选择日期 */
+
+let selectedDate =
+getToday();
+
+
+/* 当前显示月份 */
+
+let calendarDate =
+new Date();
+
+
+/* =====================================================
+   日期
+===================================================== */
+
+function getToday(){
+
+    const d = new Date();
+
+    return formatDate(d);
+
+}
+
+
+function formatDate(date){
+
+    const y = date.getFullYear();
+
+    const m =
+        String(date.getMonth()+1)
+        .padStart(2,"0");
+
+    const d =
+        String(date.getDate())
+        .padStart(2,"0");
+
+    return `${y}-${m}-${d}`;
+}
+
+
+/* =====================================================
+   获取某一天的数据
+===================================================== */
+
+function getDay(date){
+
+    return data.days[date] || {};
+
+}
+
+
+/* =====================================================
+   保存
+===================================================== */
+
+function save(){
+
+    localStorage.setItem(
+        "disciplineData",
+        JSON.stringify(data)
+    );
+
+}
+
+
+/* =====================================================
+   日历
+===================================================== */
+
+function renderCalendar(){
+
+    const year =
+        calendarDate.getFullYear();
+
+    const month =
+        calendarDate.getMonth();
+
+
+    document.getElementById("monthTitle")
+        .innerText =
+        `${year}年 ${month+1}月`;
+
+
+    const container =
+        document.getElementById("calendarDays");
+
+    container.innerHTML="";
+
+
+    const firstDay =
+        new Date(year,month,1)
+        .getDay();
+
+
+    const daysInMonth =
+        new Date(year,month+1,0)
+        .getDate();
+
+
+    /* 空白 */
+
+    for(let i=0;i<firstDay;i++){
+
+        const empty =
+            document.createElement("div");
+
+        container.appendChild(empty);
+
+    }
+
+
+    /* 日期 */
+
+    for(let day=1;day<=daysInMonth;day++){
+
+        const date =
+            new Date(year,month,day);
+
+        const key =
+            formatDate(date);
+
+        const div =
+            document.createElement("div");
+
+        div.className="calendar-day";
+
+        div.innerText=day;
+
+
+        /* 今天 */
+
+        if(key===getToday()){
+
+            div.classList.add("today");
+
+        }
+
+
+        /* 当前选择 */
+
+        if(key===selectedDate){
+
+            div.classList.add("selected");
+
+        }
+
+
+        /* 有记录 */
+
+        const dayData =
+            getDay(key);
+
+        if(Object.keys(dayData).length>0){
+
+            const dot =
+                document.createElement("span");
+
+            dot.className="dot";
+
+            div.appendChild(dot);
+
+        }
+
+
+        div.onclick=function(){
+
+            selectedDate=key;
+
+            renderCalendar();
+
+            renderSelectedDay();
+
+        };
+
+
+        container.appendChild(div);
+
+    }
+
+}
+
+
+function changeMonth(amount){
+
+    calendarDate.setMonth(
+        calendarDate.getMonth()+amount
+    );
+
+    renderCalendar();
+
+}
+
+
+/* =====================================================
+   打卡
+===================================================== */
+
+function toggleHabit(type){
+
+    if(!data.days[selectedDate]){
+
+        data.days[selectedDate]={};
+
+    }
+
+
+    const current =
+        data.days[selectedDate][type] || false;
+
+
+    data.days[selectedDate][type] =
+        !current;
+
+
+    save();
+
+    renderCalendar();
+
+    renderSelectedDay();
+
+    updateStats();
+    // PWA Service Worker
+    if ("serviceWorker" in navigator) {
+
+        window.addEventListener("load", () => {
+
+            navigator.serviceWorker.register(
+                "./service-worker.js"
+            );
+
+        });
+
+    }
+}
+
+
+/* =====================================================
+   显示选择日期
+===================================================== */
+
+function renderSelectedDay(){
+
+    const day =
+        getDay(selectedDate);
+
+
+    const core =
+        !!day.core;
+
+
+    const exercise =
+        !!day.exercise;
+
+
+    const study =
+        !!day.study;
+
+
+    const sleep =
+        !!day.sleep;
+
+
+    const water =
+        !!day.water;
+
+
+    updateButton(
+        "mainCheck",
+        core,
+        "今日戒掉欲望",
+        "✓ 已完成"
+    );
+
+
+    updateButton(
+        "exerciseBtn",
+        exercise,
+        "打卡",
+        "✓"
+    );
+
+
+    updateButton(
+        "studyBtn",
+        study,
+        "打卡",
+        "✓"
+    );
+
+
+    updateButton(
+        "sleepBtn",
+        sleep,
+        "打卡",
+        "✓"
+    );
+
+
+    updateButton(
+        "waterBtn",
+        water,
+        "打卡",
+        "✓"
+    );
+
+
+    const total =
+        5;
+
+    const completed =
+        [
+            core,
+            exercise,
+            study,
+            sleep,
+            water
+        ].filter(Boolean).length;
+
+
+    const percent =
+        Math.round(
+            completed / total * 100
+        );
+
+
+    document.getElementById("progressText")
+        .innerText =
+        percent+"%";
+
+
+    document.getElementById("progressFill")
+        .style.width =
+        percent+"%";
+
+
+    document.getElementById("status")
+        .innerText =
+        selectedDate===getToday()
+        ? (
+            core
+            ? "今天已经完成，坚持下去！"
+            : "今天还没有完成"
+        )
+        : `${selectedDate} 的记录`;
+
+
+}
+
+
+function updateButton(
+    id,
+    checked,
+    normal,
+    done
+){
+
+    const btn =
+        document.getElementById(id);
+
+    btn.innerText =
+        checked ? done : normal;
+
+    btn.classList.toggle(
+        "checked",
+        checked
+    );
+
+}
+
+
+/* =====================================================
+   连续天数
+===================================================== */
+
+function calculateStreak(){
+
+    const dates =
+        Object.keys(data.days)
+        .filter(
+            date =>
+            data.days[date] &&
+            data.days[date].core
+        )
+        .sort();
+
+
+    if(dates.length===0){
+
+        return 0;
+
+    }
+
+
+    let longest=1;
+
+    let current=1;
+
+
+    for(let i=1;i<dates.length;i++){
+
+        const previous =
+            new Date(dates[i-1]);
+
+        const currentDate =
+            new Date(dates[i]);
+
+
+        const diff =
+            Math.round(
+                (
+                    currentDate -
+                    previous
+                ) /
+                (1000*60*60*24)
+            );
+
+
+        if(diff===1){
+
+            current++;
+
+            longest =
+                Math.max(
+                    longest,
+                    current
+                );
+
+        }else{
+
+            current=1;
+
+        }
+
+    }
+
+
+    /* 当前连续 */
+
+    const today =
+        getToday();
+
+
+    let streak=0;
+
+    let check =
+        new Date(today);
+
+
+    while(true){
+
+        const key =
+            formatDate(check);
+
+        if(
+            data.days[key] &&
+            data.days[key].core
+        ){
+
+            streak++;
+
+            check.setDate(
+                check.getDate()-1
+            );
+
+        }else{
+
+            break;
+
+        }
+
+    }
+
+
+    return {
+        current:streak,
+        longest:longest
+    };
+
+}
+
+
+/* =====================================================
+   统计
+===================================================== */
+
+function updateStats(){
+
+    const result =
+        calculateStreak();
+
+
+    const current =
+        typeof result==="object"
+        ? result.current
+        : 0;
+
+
+    const longest =
+        typeof result==="object"
+        ? result.longest
+        : 0;
+
+
+    document.getElementById("streak")
+        .innerText =
+        current;
+
+
+    document.getElementById("longest")
+        .innerText =
+        longest;
+
+
+    const total =
+        Object.keys(data.days)
+        .filter(
+            date =>
+            data.days[date] &&
+            data.days[date].core
+        )
+        .length;
+
+
+    document.getElementById("total")
+        .innerText =
+        total;
+
+}
+
+
+/* =====================================================
+   重置
+===================================================== */
+
+function resetData(){
+
+    const ok =
+        confirm(
+            "确定要清除全部打卡记录吗？\n这个操作无法恢复。"
+        );
+
+
+    if(!ok)return;
+
+
+    data={
+        days:{}
+    };
+
+
+    localStorage.removeItem(
+        "disciplineData"
+    );
+
+
+    selectedDate=getToday();
+
+    calendarDate=new Date();
+
+
+    renderCalendar();
+
+    renderSelectedDay();
+
+    updateStats();
+
+}
+
+
+/* =====================================================
+   初始化
+===================================================== */
+
+renderCalendar();
+
+renderSelectedDay();
+
+updateStats();
+
+</script>
+
+</body>
+</html>
+```
